@@ -21,6 +21,10 @@ This was created because I wanted a more themed GUI for ESP, and I was disappoin
 - The script is also draggable.
 - A glowing "heartbeat" red cross indicates that a feature is turned on.
 
+## Compatibility 
+This will work on any internal executor. 
+It has been tested with Potassium, Xeno, Solara, and Madium.
+
 ## Executing
 ```
 loadstring(game:HttpGet("https://raw.githubusercontent.com/poweringhate/Genesis-Universal-ESP/refs/heads/main/script"))()
