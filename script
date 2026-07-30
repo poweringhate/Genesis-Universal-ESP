@@ -1,0 +1,206 @@
+-- [[ Genesis Universal ESP - Fixed & Animated ]] --
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local TweenService = game:GetService("TweenService")
+
+-- Global States
+local STATES = {
+    Master = true,
+    Chams = true,
+    DisplayName = true,
+    Username = false,
+    Tools = true,
+    Distance = true,
+    Boxes = false,
+    Tracers = false,
+    TeamCheck = false
+}
+
+local SETTINGS = {
+    MenuKeybind = Enum.KeyCode.End,
+    NameSize = 14,
+    Crimson = Color3.fromRGB(180, 0, 0), 
+    GlowCrimson = Color3.fromRGB(255, 0, 0),
+    FlashColor = Color3.fromRGB(255, 30, 30),
+    MainFont = Enum.Font.Bodoni 
+}
+
+-- [[ GUI ]] --
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "Genesis_Main"
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 220, 0, 460)
+MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 8) 
+MainFrame.BorderSizePixel = 0 
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+local UIOutline = Instance.new("UIStroke", MainFrame)
+UIOutline.Thickness = 2; UIOutline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 45); Title.Text = "Genesis Universal ESP"
+Title.TextColor3 = SETTINGS.Crimson; Title.TextSize = 20; Title.Font = SETTINGS.MainFont; Title.BackgroundTransparency = 1
+
+local Layout = Instance.new("UIListLayout", MainFrame)
+Layout.Padding = UDim.new(0, 5); Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center; Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Global Pulse Logic
+local pulseValue = 0
+RunService.RenderStepped:Connect(function()
+    pulseValue = (math.sin(tick() * 4) + 1) / 2 
+    UIOutline.Color = Color3.new((SETTINGS.Crimson.R * 0.7) + (pulseValue * 0.3), 0, 0)
+end)
+
+local function CleanAllHighlights()
+    for _, p in pairs(Players:GetPlayers()) do
+        if p.Character then
+            local h = p.Character:FindFirstChild("ESP_Cham")
+            if h then h:Destroy() end
+        end
+    end
+end
+
+local function CreateToggle(name, stateKey, order)
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Size = UDim2.new(0.9, 0, 0, 35); btn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    btn.Text = "  " .. name; btn.Font = SETTINGS.MainFont; btn.TextColor3 = SETTINGS.Crimson; btn.TextSize = 19
+    btn.AutoButtonColor = false; btn.TextXAlignment = Enum.TextXAlignment.Left; btn.LayoutOrder = order
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    local CrossContainer = Instance.new("Frame", btn)
+    CrossContainer.Size = UDim2.new(0, 25, 1, 0); CrossContainer.Position = UDim2.new(1, -35, 0, 0); CrossContainer.BackgroundTransparency = 1; CrossContainer.Visible = STATES[stateKey]
+
+    -- Re-implementing the Glowing Pulse for Crosses
+    local glowLayers = {}
+    for i = 1, 3 do
+        local Glow = Instance.new("TextLabel", CrossContainer)
+        Glow.Size = UDim2.new(1, 0, 1, 0); Glow.BackgroundTransparency = 1; Glow.Text = "†"
+        Glow.TextColor3 = SETTINGS.GlowCrimson; Glow.TextSize = 18 + (i * 2); Glow.Font = Enum.Font.GothamBold
+        table.insert(glowLayers, Glow)
+    end
+
+    local MainCross = Instance.new("TextLabel", CrossContainer)
+    MainCross.Size = UDim2.new(1, 0, 1, 0); MainCross.BackgroundTransparency = 1; MainCross.Text = "†"
+    MainCross.TextColor3 = SETTINGS.Crimson; MainCross.TextSize = 20; MainCross.Font = Enum.Font.GothamBold
+
+    -- Pulse Animation
+    RunService.RenderStepped:Connect(function()
+        if CrossContainer.Visible then
+            local alpha = 0.3 + (pulseValue * 0.6)
+            for _, g in pairs(glowLayers) do g.TextTransparency = 1 - (alpha * 0.5) end
+            MainCross.TextTransparency = 1 - alpha
+        end
+    end)
+
+    btn.MouseButton1Click:Connect(function()
+        -- Robust Flash Logic: Forces color back to original to prevent getting stuck red
+        btn.BackgroundColor3 = SETTINGS.FlashColor
+        local returnTween = TweenService:Create(btn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(15, 15, 15)})
+        returnTween:Play()
+        
+        STATES[stateKey] = not STATES[stateKey]
+        CrossContainer.Visible = STATES[stateKey]
+        
+        if stateKey == "Chams" and not STATES[stateKey] then CleanAllHighlights() end
+    end)
+end
+
+-- Generate Toggles
+CreateToggle("ESP Toggle", "Master", 1)
+CreateToggle("Chams", "Chams", 2)
+CreateToggle("Display Name", "DisplayName", 3)
+CreateToggle("Username", "Username", 4)
+CreateToggle("Player Tools", "Tools", 5)
+CreateToggle("Distance", "Distance", 6)
+CreateToggle("Boxes", "Boxes", 7)
+CreateToggle("Tracers", "Tracers", 8)
+CreateToggle("Team Check", "TeamCheck", 9)
+
+local Hint = Instance.new("TextLabel", MainFrame)
+Hint.Size = UDim2.new(1, 0, 0, 35); Hint.Text = "[END] to hide menu"; Hint.TextColor3 = SETTINGS.Crimson; Hint.TextSize = 17; Hint.Font = SETTINGS.MainFont; Hint.LayoutOrder = 10; Hint.BackgroundTransparency = 1
+
+-- [[ ESP ENGINE ]] --
+local function createESP(player)
+    if player == LocalPlayer then return end
+    local BoxOutline = Drawing.new("Square"); BoxOutline.Thickness = 3; BoxOutline.Color = Color3.new(0,0,0)
+    local Box = Drawing.new("Square"); Box.Thickness = 1
+    local tracerLine = Drawing.new("Line"); tracerLine.Thickness = 1
+
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        local char = player.Character
+        if not player.Parent then 
+            connection:Disconnect(); Box:Remove(); BoxOutline:Remove(); tracerLine:Remove()
+            return 
+        end
+
+        if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChild("Head") then
+            Box.Visible = false; BoxOutline.Visible = false; tracerLine.Visible = false
+            return
+        end
+
+        local root = char.HumanoidRootPart
+        local head = char.Head
+        local isSameTeam = (player.Team == LocalPlayer.Team and player.Team ~= nil)
+        local shouldShow = STATES.Master and not (STATES.TeamCheck and isSameTeam)
+        local teamCol = player.TeamColor.Color
+
+        if shouldShow and STATES.Chams then
+            local highlight = char:FindFirstChild("ESP_Cham")
+            if not highlight then
+                highlight = Instance.new("Highlight")
+                highlight.Name = "ESP_Cham"; highlight.Parent = char
+                highlight.FillTransparency = 0.5; highlight.OutlineColor = Color3.new(1,1,1)
+            end
+            highlight.Enabled = true; highlight.FillColor = teamCol
+        else
+            local h = char:FindFirstChild("ESP_Cham")
+            if h then h.Enabled = false end
+        end
+
+        local rootPos, onScreen = Camera:WorldToViewportPoint(root.Position)
+        if shouldShow and onScreen then
+            if STATES.Boxes then
+                local headPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+                local legPos = Camera:WorldToViewportPoint(root.Position - Vector3.new(0, 3, 0))
+                local h = math.abs(headPos.Y - legPos.Y); local w = h / 1.5
+                Box.Size = Vector2.new(w, h); Box.Position = Vector2.new(rootPos.X - w/2, rootPos.Y - h/2); Box.Color = teamCol; Box.Visible = true
+                BoxOutline.Size = Box.Size; BoxOutline.Position = Box.Position; BoxOutline.Visible = true
+            else Box.Visible = false; BoxOutline.Visible = false end
+
+            if STATES.Tracers then
+                tracerLine.To = Vector2.new(rootPos.X, rootPos.Y); tracerLine.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y); tracerLine.Color = teamCol; tracerLine.Visible = true
+            else tracerLine.Visible = false end
+
+            local bb = head:FindFirstChild("LS_Name") or Instance.new("BillboardGui", head)
+            bb.Name = "LS_Name"; bb.Size = UDim2.new(0, 200, 0, 80); bb.AlwaysOnTop = true; bb.Enabled = true
+            local label = bb:FindFirstChild("Label") or Instance.new("TextLabel", bb)
+            label.Name = "Label"; label.BackgroundTransparency = 1; label.Size = UDim2.new(1,0,1,0); label.Font = Enum.Font.GothamBold; label.TextSize = SETTINGS.NameSize; label.TextColor3 = teamCol
+            
+            local txt = ""
+            if STATES.Username then txt = player.Name elseif STATES.DisplayName then txt = player.DisplayName end
+            if STATES.Distance then txt = txt .. " [" .. math.floor((root.Position - Camera.CFrame.Position).Magnitude / 3) .. "m]" end
+            if STATES.Tools then local t = char:FindFirstChildOfClass("Tool") if t then txt = txt .. "\n" .. t.Name end end
+            label.Text = txt
+        else
+            Box.Visible = false; BoxOutline.Visible = false; tracerLine.Visible = false
+            if head:FindFirstChild("LS_Name") then head.LS_Name.Enabled = false end
+        end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do createESP(p) end
+Players.PlayerAdded:Connect(createESP)
+
+UserInputService.InputBegan:Connect(function(i, g)
+    if not g and i.KeyCode == SETTINGS.MenuKeybind then MainFrame.Visible = not MainFrame.Visible end
+end)
