@@ -2,15 +2,21 @@
 A vibecoded open-source universal ESP for Roblox with a unique "Genesis" theme.
 
 ## Features
-- ESP Toggle (Turn the ESP on or off)
-- Chams ESP (Uses character ESP to highlight players)
-- Display name ESP (
-- Username ESP (Detects username)
-- Player tools (Detects the tool that the player is holding)
-- Distance (Detects approximant distance between you and other players)
-- Boxes ESP (Uses boxes to highlight players)
-- Tracers (Lines that show the directions of the players)
-- Team Check (Disable ESP for your own team)
+- ESP Toggle 
+- Chams ESP 
+- Display name ESP 
+- Username ESP 
+- Player tools 
+- Distance 
+- Boxes ESP 
+- Tracers 
+- Team Check
+
+## Instructions
+Simply select which features you want on or off.
+By default, ESP is enabled, with Chams, Display name, Player Tools, and Distance being enabled.
+To hide the GUI, press the END button on your keyboard.
+The script is also draggable. 
 
 ## Executing
 ```
