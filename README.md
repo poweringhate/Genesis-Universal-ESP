@@ -1,5 +1,6 @@
 # Genesis-Universal-ESP
 A vibecoded open-source universal ESP for Roblox with a unique "Genesis" theme.
+This was created because I wanted a more themed GUI for ESP, and I was disappointed with the lack of configurability in many ESP scripts.
 
 ## Features
 - ESP Toggle 
@@ -13,10 +14,11 @@ A vibecoded open-source universal ESP for Roblox with a unique "Genesis" theme.
 - Team Check
 
 ## Instructions
-Simply select which features you want on or off.
-By default, ESP is enabled, with Chams, Display name, Player Tools, and Distance being enabled.
-To hide the GUI, press the END button on your keyboard.
-The script is also draggable. 
+- Simply select which features you want on or off.
+- By default, ESP is enabled, with Chams, Display name, Player Tools, and Distance being enabled.
+- To hide the GUI, press the END button on your keyboard.
+- The script is also draggable.
+- A glowing "heartbeat" red cross indicates that a feature is turned on.
 
 ## Executing
 ```
