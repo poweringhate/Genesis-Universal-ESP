@@ -22,3 +22,5 @@ The script is also draggable.
 ```
 loadstring(game:HttpGet("https://raw.githubusercontent.com/poweringhate/Genesis-Universal-ESP/refs/heads/main/script"))()
 ```
+
+<img width="232" height="469" alt="image" src="https://github.com/user-attachments/assets/3f501937-0827-4295-9bac-2c3e57b7d517" />
